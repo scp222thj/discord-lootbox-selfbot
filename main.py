@@ -1,5 +1,6 @@
 import requests
 import time
+import sys
 import base64
 import json
 from colorama import Fore, Style
@@ -107,4 +108,22 @@ def main():
     bot.run()
 
 if __name__ == "__main__":
-    main()
+
+    banner = f"""{Fore.YELLOW}
+  ____  _                       _    _                _   _                  ____        _   
+ |  _ \(_)___  ___ ___  _ __ __| |  | |    ___   ___ | |_| |__   _____  __  | __ )  ___ | |_ 
+ | | | | / __|/ __/ _ \| '__/ _` |  | |   / _ \ / _ \| __| '_ \ / _ \ \/ /  |  _ \ / _ \| __|
+ | |_| | \__ \ (_| (_) | | | (_| |  | |__| (_) | (_) | |_| |_) | (_) >  <   | |_) | (_) | |_ 
+ |____/|_|___/\___\___/|_|  \__,_|  |_____\___/ \___/ \__|_.__/ \___/_/\_\  |____/ \___/ \__| {Style.RESET_ALL}by scp222thj
+ """
+
+    print(banner)
+
+    try:
+        main()
+    except KeyboardInterrupt:
+        print(Style.RESET_ALL)
+        sys.exit()
+    except Exception as e:
+        print(f"{Style.RESET_ALL}\n{e}")
+        sys.exit()
