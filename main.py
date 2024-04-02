@@ -64,7 +64,7 @@ class LootboxBot:
         while not len(self.unlocked_items) >= len(self.LOOTBOX_ITEMS):
             self.open_lootbox()
 
-        print(f"{Fore.YELLOW}[🎉] You have unlocked all 9 available items and won the final prize!{Style.RESET_ALL}")
+        print(f"\n{Fore.YELLOW}[🎉] You have unlocked all 9 available items and won the final prize!{Style.RESET_ALL}")
 
         response = requests.get(f"{API_URL}/users/@me/lootboxes", headers=self.headers)
 
