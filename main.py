@@ -4,94 +4,107 @@ import base64
 import json
 from colorama import Fore, Style
 
-x_super_properties = {
-    "os": "Windows",
-    "client_build_number": 280472
-}
+API_URL = "https://discord.com/api/v9"
 
-lootbox_items = {
-    "1214340999644446723": "👢 Speed Boost",
-    "1214340999644446724": '🪈 →↑↓→↑↓',
-    "1214340999644446722": '🐢 Wump Shell',
-    "1214340999644446728": '🔨 Dream Hammer',
-    "1214340999644446725": '⛑️ Power Helmet',
-    "1214340999644446726": '🦆 Quack!!',
-    "1214340999644446721": '🧸 Cute Plushie',
-    "1214340999644446727": '🍌 OHHHHH BANANA',
-    "1214340999644446720": '🗡️ Buster Blade',
+class LootboxBot:
+    LOOTBOX_ITEMS = {
+        "1214340999644446723": "👢 Speed Boost",
+        "1214340999644446724": '🪈 →↑↓→↑↓',
+        "1214340999644446722": '🐢 Wump Shell',
+        "1214340999644446728": '🔨 Dream Hammer',
+        "1214340999644446725": '⛑️ Power Helmet',
+        "1214340999644446726": '🦆 Quack!!',
+        "1214340999644446721": '🧸 Cute Plushie',
+        "1214340999644446727": '🍌 OHHHHH BANANA',
+        "1214340999644446720": '🗡️ Buster Blade',
+    }
 
-}
+    unlocked_items = []
 
-unlocked_items = []
+    def __init__(self, token):
+        self.headers = get_headers(token)
 
-def has_found_all():
-    return len(unlocked_items) >= 9
+    def open_lootbox(self):
+        response = requests.post(f"{API_URL}/users/@me/lootboxes/open", headers=self.headers)
 
-invalidToken = True
+        data = response.json()
 
-while invalidToken:
+        if data["opened_item"] not in self.unlocked_items:
+            print(f"{Fore.GREEN}[🎁] Unlocked a NEW lootbox item: {Fore.MAGENTA}{self.LOOTBOX_ITEMS[data['opened_item']]}{Style.RESET_ALL}")
+            self.unlocked_items.append(data["opened_item"])
+        else:
+            print(f"{Fore.RED}[🎁] Found an old lootbox item: {Fore.MAGENTA}{self.LOOTBOX_ITEMS[data['opened_item']]}{Style.RESET_ALL}")
 
-    token = input(f"{Fore.GREEN}[🔑] Paste your Discord token: {Style.RESET_ALL}")
+        time.sleep(5)
 
-    headers = {
-        "x-super-properties": base64.b64encode(json.dumps(x_super_properties).encode('utf-8')).decode('utf-8'),
+    def redeem_prize(self):
+        response = requests.post(f"{API_URL}/users/@me/lootboxes/redeem-prize", headers=self.headers)
+        if response.json()["redeemed_prize"]:
+            print(f'[🤡] Automatically redeemed reward: "I\'m a Clown" Avatar Decoration')
+
+    def log_stats(self, items):
+        print(f"\n{Fore.CYAN}[📈] Statistics{Style.RESET_ALL}")
+
+        for key, value in items.items():
+            lootbox_item = self.LOOTBOX_ITEMS[key]
+            print(f"{Style.BRIGHT}{lootbox_item}{Style.RESET_ALL}: {value} found")
+
+        total = sum(list(items.values()))
+        print(f"{Style.BRIGHT}Total{Style.RESET_ALL}: {total} items found\n")
+
+    def run(self):
+        response = requests.get(f"{API_URL}/users/@me/lootboxes", headers=self.headers)
+
+        data = response.json()
+
+        for item in data['opened_items']:
+            self.unlocked_items.append(item)
+
+        while not len(self.unlocked_items) >= len(self.LOOTBOX_ITEMS):
+            self.open_lootbox()
+
+        print(f"{Fore.YELLOW}[🎉] You have unlocked all 9 available items and won the final prize!{Style.RESET_ALL}")
+
+        response = requests.get(f"{API_URL}/users/@me/lootboxes", headers=self.headers)
+
+        data = response.json()
+
+        if not data["redeemed_prize"]:
+            self.redeem_prize()
+        
+        self.log_stats(data['opened_items'])
+
+def get_headers(token):
+    x_super_properties = {
+        "os": "Windows",
+        "client_build_number": 280472
+    }
+
+    encoded_properties = base64.b64encode(json.dumps(x_super_properties).encode('utf-8')).decode('utf-8')
+
+    return {
+        "x-super-properties": encoded_properties,
         "referrer": "https://discord.com/channels/@me",
         "authorization": token,
     }
 
-    response = requests.get("https://discord.com/api/v9/users/@me", headers=headers)
+def main():
+    valid_token = False
 
-    if response.status_code == 200:
-        invalidToken = False
-    elif response.status_code == 401:
-        print(f"{Fore.RED}[⚠️] Invalid token! Try again...{Style.RESET_ALL}")
+    while not valid_token:
 
+        token = input(f"{Fore.GREEN}[🔑] Paste your Discord token: {Style.RESET_ALL}")
 
-print(f"\n{Fore.GREEN}[👤] Logged in as: {Fore.MAGENTA}{response.json()['username']}{Style.RESET_ALL}\n")
+        response = requests.get(f"{API_URL}/users/@me", headers=get_headers(token))
 
-response = requests.get("https://discord.com/api/v9/users/@me/lootboxes", headers=headers)
+        if response.status_code == 200:
+            valid_token = True
+        elif response.status_code == 401:
+            print(f"{Fore.RED}[⚠️] Invalid token! Try again...{Style.RESET_ALL}")
 
-data = response.json()
+    print(f"\n{Fore.GREEN}[👤] Logged in as: {Fore.MAGENTA}{response.json()['username']}{Style.RESET_ALL}\n")
+    bot = LootboxBot(token)
+    bot.run()
 
-for item in data['opened_items']:
-    unlocked_items.append(item)
-
-prizeUnlocked = has_found_all()
-
-while not prizeUnlocked:
-
-    response = requests.post("https://discord.com/api/v9/users/@me/lootboxes/open", headers=headers)
-
-    data = response.json()
-
-    if data["opened_item"] not in unlocked_items:
-        print(f"{Fore.GREEN}[🎁] Unlocked a NEW lootbox item: {Fore.MAGENTA}{lootbox_items[data['opened_item']]}{Style.RESET_ALL}")
-        unlocked_items.append(data["opened_item"])
-    else:
-        print(f"{Fore.RED}[🎁] Found an old lootbox item: {Fore.MAGENTA}{lootbox_items[data['opened_item']]}{Style.RESET_ALL}")
-
-    time.sleep(5)
-
-    prizeUnlocked = has_found_all()
-
-print(f"{Fore.YELLOW}[🎉] You have unlocked all 9 available items and won the final prize!{Style.RESET_ALL}")
-
-response = requests.get("https://discord.com/api/v9/users/@me/lootboxes", headers=headers)
-
-data = response.json()
-
-if not data["redeemed_prize"]:
-    response = requests.post("https://discord.com/api/v9/users/@me/lootboxes/redeem-prize", headers=headers)
-    if response.json()["redeemed_prize"]:
-        print(f'[🤡] Automatically redeemed reward: "I\'m a Clown" Avatar Decoration')
-
-print(f"\n{Fore.CYAN}[📈] Statistics{Style.RESET_ALL}")
-
-opened_items = data['opened_items']
-
-for key, value in opened_items.items():
-    lootbox_item = lootbox_items[key]
-    print(f"{Style.BRIGHT}{lootbox_item}{Style.RESET_ALL}: {value} found")
-
-total = sum(list(opened_items.values()))
-print(f"{Style.BRIGHT}Total{Style.RESET_ALL}: {total} items found\n")
+if __name__ == "__main__":
+    main()
