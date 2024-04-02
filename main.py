@@ -4,7 +4,7 @@ import base64
 import json
 from colorama import Fore, Style
 
-xsuperproperties = {
+x_super_properties = {
     "os": "Windows",
     "client_build_number": 280472
 }
@@ -22,10 +22,10 @@ lootbox_items = {
 
 }
 
+unlocked_items = []
+
 def has_found_all():
     return len(unlocked_items) >= 9
-
-unlocked_items = []
 
 invalidToken = True
 
@@ -34,7 +34,7 @@ while invalidToken:
     token = input(f"{Fore.GREEN}[🔑] Paste your Discord token: {Style.RESET_ALL}")
 
     headers = {
-        "x-super-properties": base64.b64encode(json.dumps(xsuperproperties).encode('utf-8')).decode('utf-8'),
+        "x-super-properties": base64.b64encode(json.dumps(x_super_properties).encode('utf-8')).decode('utf-8'),
         "referrer": "https://discord.com/channels/@me",
         "authorization": token,
     }
@@ -74,7 +74,7 @@ while not prizeUnlocked:
 
     prizeUnlocked = has_found_all()
 
-print(f"\n{Fore.YELLOW}[🎉] You have unlocked all 9 available items and won the final prize!{Style.RESET_ALL}")
+print(f"{Fore.YELLOW}[🎉] You have unlocked all 9 available items and won the final prize!{Style.RESET_ALL}")
 
 response = requests.get("https://discord.com/api/v9/users/@me/lootboxes", headers=headers)
 
