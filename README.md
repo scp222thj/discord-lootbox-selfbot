@@ -12,7 +12,7 @@ A selfbot that unlocks and redeems Discord's April Fools 2024 avatar decoration 
 # clone the repo
 $ git clone https://github.com/scp222thj/discord-lootbox-selfbot.git
 
-# change the working directory to sherlock
+# change the working directory
 $ cd discord-lootbox-selfbot
 
 # install the requirements
