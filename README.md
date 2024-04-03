@@ -25,7 +25,7 @@ $ python -m pip install -r requirements.txt
 **macOS/Linux**: If both Python 2 and 3 are installed, use `python3` and `pip3` instead.
 
 ## 🤖 Running the Bot
-- Obtain your Discord token ([guide](https://www.geeksforgeeks.org/how-to-get-discord-token/)).
+- Obtain your Discord token ([guide](https://www.youtube.com/watch?v=b1SY4zTNnAE)).
 - Launch the bot: `python main.py`
 - Enter your token when prompted.
 
