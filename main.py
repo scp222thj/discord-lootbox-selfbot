@@ -94,7 +94,7 @@ def main():
 
     while not valid_token:
 
-        token = input(f"{Fore.GREEN}[🔑] Paste your Discord token: {Style.RESET_ALL}")
+        token = input(f"{Fore.GREEN}[🔑] Paste your Discord token: {Style.RESET_ALL}").strip('"').strip('\'')
 
         response = requests.get(f"{API_URL}/users/@me", headers=get_headers(token))
 
