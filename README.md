@@ -1,3 +1,5 @@
+# THIS FEATURE HAS BEEN REMOVED BY DISCORD & THE SCRIPT NO LONGER WORKS
+
 ![🎁](./image.png)
 
 A selfbot that unlocks and redeems Discord's April Fools 2024 avatar decoration by automatically opening lootboxes for you
